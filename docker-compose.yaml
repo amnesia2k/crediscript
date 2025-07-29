@@ -1,0 +1,73 @@
+services:
+  web:
+    depends_on:
+      - api
+    build:
+      context: ./client
+    ports:
+      - 5173:5173
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    volumes:
+      - ./client:/app
+      # - /app/node_modules # this keeps host from overriding container modules
+    command: pnpm dev # this will run vite
+  api:
+    depends_on:
+      - db
+    build:
+      context: ./server
+    ports:
+      - 8000:8000
+    environment:
+      - NODE_ENV=development
+      - DB_URL=mongodb://db/crediscript
+      - JWT_SECRET=g0$5%op19GkXvLTKZp8@xW3#q9$E7t8u
+      - FRONTEND_URL=http://localhost:5173
+    volumes:
+      - ./server:/app
+      # - /app/node_modules # this keeps host from overriding container modules
+    command: pnpm dev # this will run nodemon
+
+  db:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - crediscript:/data/db
+
+volumes:
+  crediscript:
+# services:
+#   api:
+#     depends_on:
+#       - db
+
+#     build: ./server
+
+#     ports:
+#       - 8000:8000
+
+#     environment:
+#       - NODE_ENV=development
+#       - DB_URL=mongodb://db/crediscript
+
+#     develop:
+#       watch:
+#         - path: ./server/package.json
+#           action: rebuild
+#         - path: ./server/pnpm-lock.yaml
+#           action: rebuild
+#         - path: ./server
+#           target: /src
+#           action: sync
+
+#   db:
+#     image: mongo:latest
+#     ports:
+#       - 27017:27017
+#     volumes:
+#       - crediscript:/data/db
+
+# volumes:
+#   crediscript:
