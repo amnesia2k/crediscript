@@ -113,7 +113,9 @@ export default function Navbar() {
           ))}
         </div>
         <Button asChild className="mt-5">
-          <Link to="/contact">Get Started</Link>
+          <Link onClick={closeSidebar} to="/contact">
+            Get Started
+          </Link>
         </Button>
       </div>
     </>
