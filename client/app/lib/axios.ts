@@ -13,8 +13,8 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((c) => {
-  // const token = localStorage.getItem("token");
-  const token = getCookie("token");
+  const token = localStorage.getItem("token");
+  // const token = getCookie("token");
 
   if (token) {
     c.headers.Authorization = `Bearer ${token}`;
@@ -26,17 +26,28 @@ api.interceptors.request.use((c) => {
 api.interceptors.response.use(
   (res) => res,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const status = error?.response?.status;
+    const path = error?.config?.url;
+
+    const token = localStorage.getItem("token");
+
+    const authFreeRoutes = [
+      "/secret/login",
+      "/secret/register",
+      "/secret/forgot-password",
+    ];
+
+    const isAuthFreeRoute = authFreeRoutes.some((r) => path?.includes(r));
+
+    if (status === 401 && token && !isAuthFreeRoute) {
       window.dispatchEvent(new Event("force-logout"));
-      // localStorage.removeItem("token");
-      // window.location.href = "/secret/login";
     }
 
     return Promise.reject(error);
   }
 );
 
-export const postData = async <T>(path: string, data: unknown): Promise<T> => {
+export const postData = async <T>(path: string, data?: unknown): Promise<T> => {
   const res = await api.post<T>(path, data);
 
   return res.data;
@@ -72,9 +83,15 @@ export function extractApiError(error: unknown): string {
   ) {
     const axiosError = error as AxiosError;
 
+    const data = axiosError.response?.data as {
+      message?: string;
+      error?: string;
+    };
+
     const message =
-      (axiosError.response?.data as { message: string })?.message ??
-      axiosError.response?.statusText ??
+      data?.message ||
+      data?.error ||
+      axiosError.response?.statusText ||
       "Unknown server error";
 
     return message;

@@ -67,7 +67,7 @@ export const createUser = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        error: "Email address already in use.",
+        message: "Email address already in use.",
       });
     }
 
@@ -116,7 +116,7 @@ export const loginUser = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        error: "Email and password are required.",
+        message: "Email and password are required.",
       });
     }
 
@@ -124,7 +124,7 @@ export const loginUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: "Invalid email or password.",
+        message: "Invalid email or password.",
       });
     }
 
@@ -132,7 +132,7 @@ export const loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        error: "Invalid email or password.",
+        message: "Invalid email or password.",
       });
     }
 

@@ -29,7 +29,7 @@ export interface AuthUser extends User {
 export type AuthResponse = {
   success: true;
   message: string;
-  data: {
+  data?: {
     user: AuthUser;
   };
 };
@@ -43,7 +43,7 @@ export type MeResponse = {
   success: true;
   message: string;
   data: {
-    user: User;
+    user: AuthUser;
   };
 };
 

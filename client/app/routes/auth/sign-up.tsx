@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { Link, Navigate, redirect, useNavigate } from "react-router";
 import { signUpSchema } from "@/lib/schema";
 import type { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -27,6 +27,7 @@ import { useSignUp } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { extractApiError } from "@/lib/axios";
+import { useAuth } from "@/providers/auth-context";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -38,6 +39,8 @@ export function meta({}: Route.MetaArgs) {
 export type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export default function SignUpPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -55,12 +58,14 @@ export default function SignUpPage() {
 
     mutate(values, {
       onSuccess: (data) => {
+        login(data);
         toast.success(data.message);
         console.log(data);
+        // navigate("/dashboard");
+        window.location.href = "/dashboard";
       },
 
       onError: (err: any) => {
-        const errMsg = err.response?.data?.message || "An error occurred";
         console.log(err);
         toast.error(extractApiError(err));
       },

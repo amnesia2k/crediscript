@@ -17,3 +17,9 @@ export const useSignIn = () => {
       postData<AuthResponse>("/auth/login", data),
   });
 };
+
+export const useSignOut = () => {
+  return useMutation({
+    mutationFn: () => postData<AuthResponse>("/auth/logout"),
+  });
+};

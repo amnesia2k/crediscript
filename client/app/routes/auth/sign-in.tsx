@@ -21,11 +21,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { Link, Navigate, redirect, useNavigate } from "react-router";
 import { PasswordInput } from "@/components/password-input";
 import { useSignIn } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { extractApiError } from "@/lib/axios";
+import { useAuth } from "@/providers/auth-context";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -37,6 +39,8 @@ export function meta({}: Route.MetaArgs) {
 export type SignInFormData = z.infer<typeof signInSchema>;
 
 export default function SignInPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const form = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -52,14 +56,16 @@ export default function SignInPage() {
 
     mutate(values, {
       onSuccess: (data) => {
+        login(data);
         toast.success(data.message);
         console.log(data);
+        // navigate("/dashboard");
+        window.location.href = "/dashboard";
       },
 
       onError: (err: any) => {
-        const errMsg = err.response?.data?.message || "An error occurred";
         console.log(err);
-        toast.error(errMsg);
+        toast.error(extractApiError(err));
       },
     });
   };

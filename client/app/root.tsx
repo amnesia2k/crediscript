@@ -11,6 +11,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { ThemeProvider } from "./components/theme-provider";
 import ReactQueryProvider from "./providers/react-query-provider";
+import { ThemeWrapper } from "./components/theme-wrapper";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -57,7 +58,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
 
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeWrapper>
+          <ThemeProvider>{children}</ThemeProvider>
+        </ThemeWrapper>
         <ScrollRestoration />
         <Scripts />
       </body>

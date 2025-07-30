@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useSignOut } from "@/hooks/use-auth";
+import { extractApiError } from "@/lib/axios";
+import { useAuth } from "@/providers/auth-context";
 import {
   CheckCircle,
   Eye,
@@ -26,8 +29,11 @@ import {
 } from "lucide-react";
 import { mockMessages, mockTestimonials } from "public/data";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
+  const { user, logout } = useAuth();
+  const { mutate, isPending } = useSignOut();
   const [messages, setMessages] = useState(mockMessages);
   const [testimonials, setTestimonials] = useState(mockTestimonials);
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
@@ -106,13 +112,41 @@ export default function DashboardPage() {
     responseRate: "95%",
   };
 
+  const handleLogout = () => {
+    mutate(undefined, {
+      onSuccess: (res) => {
+        logout(), toast.success(res.message);
+        window.location.href = "/";
+      },
+
+      onError: (err: any) => {
+        console.log(err);
+        toast.error(extractApiError(err));
+      },
+    });
+  };
+
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p>Manage messages and testimonials</p>
+        <div className="flex justify-between items-center">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p>Manage messages and testimonials</p>
+          </div>
+
+          <div className="flex items-center gap-x-2">
+            <p>Logged in as: {user?.name}</p>
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              disabled={isPending}
+              className="cursor-pointer rounded-full"
+            >
+              Logout
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
